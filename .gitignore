@@ -22,3 +22,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+/target/
+my-new-app/src/assets/Cesium-1.109/
