@@ -4,7 +4,6 @@ This project is a Rust-based Tauri GUI application that integrates Cesium for ma
 About SurrealDB
 
 SurrealDB is the ultimate database for tomorrow's serverless, jamstack, single-page, and traditional applications. It offers an SQL-style query language, real-time queries with efficient related data retrieval, advanced security permissions for multi-tenant access, and support for performant analytical workloads. SurrealDB combines the database layer, the querying layer, and the API and authentication layer into one platform, making it a next-generation serverless database. For more details, visit the official website.
-Features
 
     Cesium Integration: Visualize map data with the power of Cesium.
     SurrealDB Backend: Store and manage your data efficiently with SurrealDB's advanced features.
