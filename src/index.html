@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tauri Cesium App</title>
+    <link href="./assets/Cesium-1.109/Build/Cesium/Widgets/widgets.css" rel="stylesheet">
+    <script src="./assets/Cesium-1.109/Build/Cesium/Cesium.js"></script>
+    <script type="module" src="/main.js" defer></script>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+
+  <body>
+    <div class="app-container">
+      <div id="cesiumContainer"></div>
+    </div>
+
+    <div id="sidebar" class="sidebar">
+      <a href="javascript:void(0)" class="closebtn"">×</a>
+      <a href="#">About</a>
+      <a href="#">Contact</a>
+      <button id="loadDataBtn" class="sidebar-btn">Load Data</button>
+      <button id="clearDataBtn" class="sidebar-btn">Clear Data</button>
+    </div>
+
+    <button class="openbtn" id="toggleSidebarBtn">☰</button>
+  </body>
+</html>
