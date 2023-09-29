@@ -53,11 +53,14 @@ function closeNav() {
               pixelSize : 5,
               color : Cesium.Color.BLUE
             },
-            label : {
-              text : point.description,
-              verticalOrigin : Cesium.VerticalOrigin.BOTTOM,
-              pixelOffset : new Cesium.Cartesian2(0, -10)
-            }
+
+            description : point.description
+            // label : {
+            //   text : point.description,
+            //   font : '10px sans-serif',
+            //   verticalOrigin : Cesium.VerticalOrigin.BOTTOM,
+            //   pixelOffset : new Cesium.Cartesian2(0, -10)
+            // }
           });
         });
       });
@@ -67,8 +70,21 @@ function closeNav() {
           viewer.entities.removeAll();
       });
   
-  }, 1000);
-  
+  var handler = new Cesium.ScreenSpaceEventHandler(viewer.scene.canvas);
+  handler.setInputAction(function(movement) {
+      var pickedObject = viewer.scene.pick(movement.endPosition);
+      if (Cesium.defined(pickedObject) && Cesium.defined(pickedObject.id)) {
+          // Show the label when hovering over the point
+          pickedObject.id.label = {
+              text : pickedObject.id.description,
+              font : '20px sans-serif',
+              verticalOrigin : Cesium.VerticalOrigin.BOTTOM,
+              pixelOffset : new Cesium.Cartesian2(0, -10)
+          };
+      }
+  }, Cesium.ScreenSpaceEventType.MOUSE_MOVE);
+
+}, 1000);
 
       // const toggleSidebarBtn = document.getElementById('toggleSidebarBtn');
       // const sidebar = document.getElementById('sidebar');

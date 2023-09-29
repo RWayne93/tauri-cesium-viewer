@@ -155,13 +155,13 @@ body, html {
   color: #f1f1f1;
 }
 
-.sidebar .closebtn {
+/* .sidebar .closebtn {
   position: absolute;
   top: 0;
   right: 25px;
   font-size: 36px;
   margin-left: 50px;
-}
+} */
 
 .sidebar a, .sidebar .sidebar-btn {
   padding: 4px 8px 4px 32px;
