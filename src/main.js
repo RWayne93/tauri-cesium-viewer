@@ -8,23 +8,41 @@ function closeNav() {
   document.getElementById("sidebar").style.width = "0";
 }
 
-// let greetInputEl;
-// let greetMsgEl;
+// Define sendMessage globally
+window.sendMessage = function() {
+  const chatInput = document.getElementById('chatInput');
+  const chatMessagesContainer = document.getElementById('chatMessages');
+  const userQuery = chatInput.value;
+  chatInput.value = '';
 
-// async function greet() {
-//   greetMsgEl.textContent = await invoke("greet", { name: greetInputEl.value });
-// }
+  // Display the user's query in the chat interface
+  const userMessage = document.createElement('div');
+  userMessage.textContent = `You: ${userQuery}`;
+  userMessage.classList.add('user-message');
+  chatMessagesContainer.appendChild(userMessage);
 
-// window.addEventListener("DOMContentLoaded", () => {
-//   greetInputEl = document.querySelector("#greet-input");
-//   greetMsgEl = document.querySelector("#greet-msg");
-  
-//   if (greetInputEl && greetMsgEl) {
-//     document.querySelector("#greet-form").addEventListener("submit", (e) => {
-//       e.preventDefault();
-//       greet();
-//     });
-//   }
+  // Send the query to the Rust backend
+  invoke('process_user_query', { query: userQuery })
+    .then(response => {
+      // Display the Rust backend's response in the chat interface
+      const responseMessage = document.createElement('div');
+      responseMessage.textContent = `Rust: ${response}`;
+      responseMessage.classList.add('system-message');
+      chatMessagesContainer.appendChild(responseMessage);
+    })
+    .catch(error => {
+      console.error("Error processing user query:", error);
+      // Optionally, display an error message in the chat interface
+      const errorMessage = document.createElement('div');
+      errorMessage.textContent = `Error: ${error}`;
+      chatMessagesContainer.appendChild(errorMessage);
+    });
+};
+
+window.clearMessages = function() {
+  const chatMessagesContainer = document.getElementById('chatMessages');
+  chatMessagesContainer.innerHTML = ''; // This clears all the content inside the chat messages container
+};
 
   // Delay the initialization of the Cesium viewer using setTimeout
   setTimeout(() => {
@@ -41,50 +59,84 @@ function closeNav() {
         closeNav();
       }
     });
-  
+
+    const toggleChatBtn = document.getElementById('toggleChatBtn');
+    const chatSidebar = document.getElementById('chatSidebar');
+    toggleChatBtn.addEventListener('click', function() {
+      if (chatSidebar.style.width === '250px') {
+        chatSidebar.style.width = '0';
+      } else {
+        chatSidebar.style.width = '250px';
+      }
+    });
+
     document.getElementById('loadDataBtn').addEventListener('click', function() {
       // Fetch data from Rust backend using Tauri's API
       invoke('get_geocoordinates').then(data => {
-        console.log("Received data from Rust:", data);
-        data.forEach(point => {
-          var entity = viewer.entities.add({
-            position : Cesium.Cartesian3.fromDegrees(point.longitude, point.latitude),
-            point : {
-              pixelSize : 5,
-              color : Cesium.Color.BLUE
-            },
-
-            description : point.description
-            // label : {
-            //   text : point.description,
-            //   font : '10px sans-serif',
-            //   verticalOrigin : Cesium.VerticalOrigin.BOTTOM,
-            //   pixelOffset : new Cesium.Cartesian2(0, -10)
-            // }
+          console.log("Received data from Rust:", data);
+          data.forEach(point => {
+              var entity = viewer.entities.add({
+                  position: Cesium.Cartesian3.fromDegrees(point.longitude, point.latitude),
+                  point: {
+                      pixelSize: 5,
+                      color: Cesium.Color.BLUE
+                  },
+                  description: point.description
+              });
           });
+      });
+  });
+  
+  document.getElementById('loadFlightDataBtn').addEventListener('click', function() {
+    // Fetch flight data from Rust backend using Tauri's API
+    invoke('get_flight_coordinates')
+    .then(data => {
+        console.log("Received flight data from Rust:", data);
+        data.forEach(flight => {
+            var entity = viewer.entities.add({
+                position: Cesium.Cartesian3.fromDegrees(flight.longitude, flight.latitude),
+                point: {
+                    pixelSize: 7,
+                    color: Cesium.Color.BLUE 
+                },
+                description: flight.description
+                
+            });
         });
-      });
+    })
+    .catch(error => {
+        console.error("Error fetching flight data:", error);
     });
-
-      document.getElementById('clearDataBtn').addEventListener('click', function() {
-          viewer.entities.removeAll();
-      });
+});
+  
+  document.getElementById('clearDataBtn').addEventListener('click', function() {
+      viewer.entities.removeAll();
+  });
   
   var handler = new Cesium.ScreenSpaceEventHandler(viewer.scene.canvas);
+  var lastHoveredEntity = null;  // Variable to keep track of the last hovered entity
+  
   handler.setInputAction(function(movement) {
       var pickedObject = viewer.scene.pick(movement.endPosition);
-      if (Cesium.defined(pickedObject) && Cesium.defined(pickedObject.id)) {
+  
+      // If there was a previously hovered entity, hide its label
+      if (lastHoveredEntity) {
+          lastHoveredEntity.label = undefined;
+      }
+  
+      if (Cesium.defined(pickedObject) && Cesium.defined(pickedObject.id) && Cesium.defined(pickedObject.id.description)) {
           // Show the label when hovering over the point
           pickedObject.id.label = {
-              text : pickedObject.id.description,
-              font : '20px sans-serif',
-              verticalOrigin : Cesium.VerticalOrigin.BOTTOM,
-              pixelOffset : new Cesium.Cartesian2(0, -10)
+              text: pickedObject.id.description,
+              font: '20px sans-serif',
+              verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
+              pixelOffset: new Cesium.Cartesian2(0, -10)
           };
+          lastHoveredEntity = pickedObject.id;  // Update the last hovered entity
       }
   }, Cesium.ScreenSpaceEventType.MOUSE_MOVE);
 
-}, 1000);
+    }, 1000);
 
       // const toggleSidebarBtn = document.getElementById('toggleSidebarBtn');
       // const sidebar = document.getElementById('sidebar');

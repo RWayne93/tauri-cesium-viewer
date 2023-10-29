@@ -116,7 +116,7 @@ body, html {
   padding: 0;
   width: 100%;
   height: 100%;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .app-container {
@@ -200,4 +200,80 @@ body, html {
 @media screen and (max-height: 450px) {
   .sidebar {padding-top: 15px;}
   .sidebar a {font-size: 18px;}
+}
+
+.chat-sidebar { 
+  height: 100%;
+  width: 0;
+  position: fixed;
+  z-index: 1;
+  top: 0;
+  right: 0;
+  background-color: #111;
+  overflow-x: hidden;
+  transition: 0.5s;
+  padding-top: 60px;
+  box-shadow: -5px 0 15px rgba(0, 0, 0, 0.5);
+}
+
+.chat-header {
+  padding: 4px 8px;
+  font-size: 25px;
+  color: #818181;
+}
+
+.chat-messages {
+  padding: 4px 8px;
+  overflow-y: auto;
+  max-height: 80%;
+}
+
+.chat-input-container {
+  padding: 4px 8px;
+}
+
+#chatInput {
+  width: 80%;
+  padding: 4px;
+  font-size: 16px;
+}
+
+.chat-sidebar button {
+  background-color: #4CAF50;
+  color: white;
+  padding: 4px 8px;
+  margin: 4px 0;
+  border: none;
+  cursor: pointer;
+  width: 20%;
+  font-size: 16px;
+}
+
+.chat-sidebar button:hover {
+  background-color: #45a049;
+}
+
+.open-chat-btn {
+  font-size: 20px;
+  cursor: pointer;
+  background-color: #111;
+  color: white;
+  padding: 5px 10px;
+  border: none;
+  position: fixed;
+  top: 0;
+  right: 0;
+  z-index: 2;
+}
+
+.open-chat-btn:hover {
+  background-color: #444;
+}
+
+.user-message {
+  color: blue;
+}
+
+.system-message {
+  color: red;
 }

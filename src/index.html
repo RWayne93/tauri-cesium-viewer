@@ -19,10 +19,23 @@
       <!-- <a href="javascript:void(0)" class="closebtn"">×</a> -->
       <a href="#">About</a>
       <a href="#">Contact</a>
-      <button id="loadDataBtn" class="sidebar-btn">Load Data</button>x`
+      <button id="loadDataBtn" class="sidebar-btn">Load Data</button>
+      <button id="loadFlightDataBtn" class="sidebar-btn">Load Flight Data</button> <!-- New button for loading flight data -->
       <button id="clearDataBtn" class="sidebar-btn">Clear Data</button>
     </div>
 
     <button class="openbtn" id="toggleSidebarBtn">☰</button>
+
+    <div id="chatSidebar" class="chat-sidebar">
+      <div class="chat-header">Chat</div>
+      <div class="chat-messages" id="chatMessages"></div>
+      <div class="chat-input-container">
+        <input type="text" id="chatInput" placeholder="Type a message..." />
+        <button onclick="sendMessage()">Send</button>
+        <button onclick="clearMessages()">Clear</button>
+      </div>
+    </div>
+    
+    <button class="open-chat-btn" id="toggleChatBtn">☰</button>    
   </body>
 </html>
