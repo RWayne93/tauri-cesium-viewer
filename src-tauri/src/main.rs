@@ -4,6 +4,7 @@
 use serde::{Deserialize, Serialize};
 use surrealdb::engine::remote::ws::Ws;
 use surrealdb::Surreal;
+use std::collections::HashMap;
 // use std::collections::HashSet;
 // use tokio::time::{interval, Duration};
 // use reqwest::Error;
@@ -192,11 +193,63 @@ async fn get_flight_coordinates() -> Result<Vec<FlightCoordinate>, String> {
     Ok(flight_coordinates)
 }
 
+async fn get_flight_count(destination: String) -> Result<i64, String> {
+    // Connect to the server
+    let db = Surreal::new::<Ws>("127.0.0.1:8000").await.map_err(|e| e.to_string())?;
+    
+    // Select the namespace and database
+    db.use_ns("test").use_db("test").await.map_err(|e| e.to_string())?;
+    
+    // Create the SurrealQL query
+    let sql = "SELECT count() FROM flights WHERE centre.description.destination = $destination GROUP All";
+    
+    // Perform the query
+    let mut result = db.query(sql)
+        .bind(("destination", destination))
+        .await
+        .map_err(|e| e.to_string())?;
+    
+    let count_result: Vec<HashMap<String, serde_json::Value>> = result
+        .take(0)
+        .map_err(|e| e.to_string())?;  // Use ? here to propagate the error
+    
+    if let Some(first_row) = count_result.get(0) {
+        if let Some(count_val) = first_row.get("count") {
+            if let Some(count) = count_val.as_i64() {
+                Ok(count)
+            } else {
+                Err("Count field is not an i64".to_string())
+            }
+        } else {
+            Err("Count field not found in the result".to_string())
+        }
+    } else {
+        Err("No result returned from the database".to_string())
+    }
+}
+
+
+
+// #[tauri::command]
+// async fn process_user_query(query: String) -> Result<String, String> {
+   
+//     Ok(format!("Hello from Rust backend! Your query was: {}", query))
+
+// }
+
 #[tauri::command]
 async fn process_user_query(query: String) -> Result<String, String> {
-   
-    Ok(format!("Hello from Rust backend! Your query was: {}", query))
-
+    // Example query: "how many flights are going to Denver?"
+    if let Some(destination) = query.strip_prefix("how many flights are going to ") {
+        // Remove potential punctuation and convert to uppercase for the database query
+        let destination_upper = destination.trim_end_matches(['?', '.', '!']).to_uppercase();
+        match get_flight_count(destination_upper.clone()).await {
+            Ok(count) => Ok(format!("There are {} flights going to {}", count, destination_upper)),
+            Err(err) => Err(format!("Failed to get flight count: {}", err)),
+        }
+    } else {
+        Ok(format!("I'm not sure how to answer that. Your query was: {}", query))
+    }
 }
 
 // #[derive(serde::Deserialize)]
