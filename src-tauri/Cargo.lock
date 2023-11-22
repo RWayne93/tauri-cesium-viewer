@@ -2394,6 +2394,7 @@ dependencies = [
 name = "my-new-app"
 version = "0.0.0"
 dependencies = [
+ "lazy_static",
  "serde",
  "serde_json",
  "surrealdb",

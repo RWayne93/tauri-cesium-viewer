@@ -54,6 +54,9 @@ struct FlightCoordinate {
     description: String,
 }
 
+#[macro_use]
+extern crate lazy_static;
+
 // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
 #[tauri::command]
 fn greet(name: &str) -> String {
@@ -193,6 +196,18 @@ async fn get_flight_coordinates() -> Result<Vec<FlightCoordinate>, String> {
     Ok(flight_coordinates)
 }
 
+lazy_static! {
+    static ref CITY_TO_AIRPORT_CODE: HashMap<String, &'static str> = {
+        let mut m = HashMap::new();
+        m.insert("denver".to_string(), "DEN");
+        m.insert("los angeles".to_string(), "LAX");
+        m.insert("las vegas".to_string(), "LAS");
+        // ... add more mappings here
+        m
+    };
+}
+
+
 async fn get_flight_count(destination: String) -> Result<i64, String> {
     // Connect to the server
     let db = Surreal::new::<Ws>("127.0.0.1:8000").await.map_err(|e| e.to_string())?;
@@ -229,7 +244,6 @@ async fn get_flight_count(destination: String) -> Result<i64, String> {
 }
 
 
-
 // #[tauri::command]
 // async fn process_user_query(query: String) -> Result<String, String> {
    
@@ -239,13 +253,17 @@ async fn get_flight_count(destination: String) -> Result<i64, String> {
 
 #[tauri::command]
 async fn process_user_query(query: String) -> Result<String, String> {
-    // Example query: "how many flights are going to Denver?"
     if let Some(destination) = query.strip_prefix("how many flights are going to ") {
-        // Remove potential punctuation and convert to uppercase for the database query
-        let destination_upper = destination.trim_end_matches(['?', '.', '!']).to_uppercase();
-        match get_flight_count(destination_upper.clone()).await {
-            Ok(count) => Ok(format!("There are {} flights going to {}", count, destination_upper)),
-            Err(err) => Err(format!("Failed to get flight count: {}", err)),
+        let destination_clean = destination.trim_end_matches(['?', '.', '!']).to_lowercase();
+        
+        // Use the map to get the airport code
+        if let Some(&airport_code) = CITY_TO_AIRPORT_CODE.get(&destination_clean) {
+            match get_flight_count(airport_code.to_string()).await {
+                Ok(count) => Ok(format!("There are {} flights going to {}", count, airport_code)),
+                Err(err) => Err(format!("Failed to get flight count for {}: {}", airport_code, err)),
+            }
+        } else {
+            Err(format!("Could not find an airport code for the city name: {}", destination))
         }
     } else {
         Ok(format!("I'm not sure how to answer that. Your query was: {}", query))

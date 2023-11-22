@@ -8,6 +8,17 @@ function closeNav() {
   document.getElementById("sidebar").style.width = "0";
 }
 
+Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiIyMWE3NGExNy1jNjFmLTQ2NTYtOTA3My0xZDU3ODk3NjNhNGIiLCJpZCI6MTc2NjQ3LCJpYXQiOjE2OTkzNzI3NjJ9.AIUtu9inNbyUpMRFZH5jN9PRWp1N2noqiZ_TrzWD5ro';
+
+// Add event listener for the enter key on the chat input
+document.getElementById('chatInput').addEventListener('keydown', function(event) {
+  if (event.key === 'Enter') {
+    event.preventDefault();
+    window.sendMessage();
+  }
+});
+
+
 // Define sendMessage globally
 window.sendMessage = function() {
   const chatInput = document.getElementById('chatInput');
